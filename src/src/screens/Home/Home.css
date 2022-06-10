@@ -1,0 +1,18 @@
+.upcomingHead {
+    background-color: #ff9999;
+    padding: 8px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.flex-container {
+    display: flex;
+    justify-content: space-between;
+}
+.left {
+    width: 70%;
+}
+.right {
+    padding-top: 20px;
+    width: 30%;
+}
