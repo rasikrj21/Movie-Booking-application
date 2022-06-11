@@ -1,0 +1,33 @@
+.upcomingHead {
+    background-color: #ff9999;
+    padding: 8px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.flex-container {
+    display: flex;
+    margin: 0 16px;
+}
+.left {
+    width: 80%;
+    margin-right: 16px;
+}
+.movie-card {
+    cursor: pointer;
+}
+.right {
+    padding-top: 20px;
+    width: 20%;
+    text-align:center;
+}
+
+.carContent {
+    width: 100%;
+}
+.formHead {
+    color: #3452b4;
+}
+#dropdown {
+    margin-left: 24px;
+}

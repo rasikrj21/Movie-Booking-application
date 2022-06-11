@@ -1,0 +1,25 @@
+.details {
+    font-family: "Roboto";
+}
+
+.details-container {
+    padding: 16px 24px 48px 24px;
+}
+
+.flexContainer {
+    display: flex;
+    margin: 2%;
+}
+.leftContent {
+    width: 20%;
+    text-align: center;
+}
+.middleContent {
+    width: 60%;
+}
+.rightContent {
+    width: 20%;
+}
+.artist-margin {
+    margin: 16px 0;
+}

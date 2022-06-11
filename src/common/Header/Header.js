@@ -1,10 +1,17 @@
-import React from 'react';
+import React, { Component } from 'react';
 import './Header.css';
+import SiteLogo from './../../assets/logo.svg';
 
-export default function Header() {
-    return(
-        <header>
-            <img className="siteLogo" src="https://cdn.upgrad.com/uploads/production/286e1f11-1897-4d0c-ab0f-6b2bfc1ce642/logo.svg" alt="Site Logo" />
-        </header> 
-    );   
+class Header extends Component {
+
+    render() {
+      return (
+        <div className="header">
+          <img className="siteLogo" src={SiteLogo} alt="Site Logo" />
+          {this.props.children};
+        </div>
+      );
+    }
 }
+
+export default Header;
