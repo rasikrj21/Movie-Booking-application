@@ -1,48 +1,136 @@
 import React, {
     createContext,
     useContext,
-    useEffect,
     useState,
 } from 'react';
 
 
-export const MovieReleasesContext = createContext({});
+export const GlobalContext = createContext({});
 
-export function useMovieReleases() {
-    return useContext(MovieReleasesContext);
+export function useGlobals() {
+    return useContext(GlobalContext);
 }
 
-export default function MovieReleasesProvider({
-                                                  children,
-                                              }) {
+export default function GlobalProvider({children}) {
+    const baseUrl = "/api/v1"
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isRegistered, setIsRegistered] = useState(false);
+    const [authHeader, setAuthHeader] = useState('');
+    const [loginResponse, setLoginResponse] = useState({});
+    const [movieId, setMovieId] = useState('');
+    const updateMovieId = value => setMovieId(value);
+    const updateIsLoggedIn = (value) => setIsLoggedIn(value);
 
-    const [movies, setMovies] = useState([]);
-    const [ogMoviesValues, setogMoviesValues] = useState([]);
-    const [ismoviesLoaded, setismoviesLoaded] = useState(false);
+    const [modalIsOpen, setIsOpen] = React.useState(false);
 
-    const updateMovies = (value) => setMovies([...value]);
+    function toggleModal() {
+        setIsOpen(!modalIsOpen);
+    }
 
-
-    useEffect(() => {
-        const fetchMovie = async () => {
-            const response = await fetch("/api/v1/movies?page=1&status=RELEASED")
+    const callLogin = async (email, password) => {
+        console.log(email, password)
+        const authParams = window.btoa(`${email}:${password}`)
+        setAuthHeader(authParams);
+        try {
+            const response = await fetch(`${baseUrl}/auth/login`, {
+                method: "POST",
+                headers: {
+                    "accept": "application/json;charset=UTF-8",
+                    "Authorization": `Basic ${authParams}`
+                }
+            });
             const json = await response.json();
-            // setstartMovies(json);
-            console.log(json.movies)
-            if (json.movies) {
-                setMovies([...json.movies]);
-                setogMoviesValues([...json.movies])
-                setismoviesLoaded(true);
+            console.log("in resp")
+            if (response.ok) {
+                console.log("in resp")
+                window.sessionStorage.setItem('user-details', JSON.stringify(json));
+                window.sessionStorage.setItem('access-token', response.headers.get('access-token'));
+                setLoginResponse(json);
+                updateIsLoggedIn(true);
+                toggleModal();
+            } else {
+                const error = new Error();
+                error.message = json.message || 'Something went wrong!'
             }
+        } catch (e) {
+            alert(`Error ${e.message}`)
         }
-        fetchMovie();
-    }, []);
+
+    }
+
+    const callSignUp = async (values) => {
+        const data = {
+            email_address: values.email,
+            first_name: values.firstName,
+            last_name: values.lastName,
+            mobile_number: values.contactNumber,
+            password: values.password
+        }
+        try {
+            const response = await fetch(`${baseUrl}/signup`, {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json;charset=UTF-8",
+                    "Content-Type": "application/json;charset=UTF-8"
+                },
+                body: JSON.stringify(data)
+            });
+            const json = await response.json();
+            if (response.ok) {
+                setIsRegistered(true);
+            } else {
+                const error = new Error();
+                error.message = json.message || 'Something went wrong!'
+            }
+        } catch (e) {
+            alert(`Error ${e.message}`)
+        }
+
+
+    }
+
+    const callLogOut = async () => {
+        const token = window.sessionStorage.getItem('access-token');
+
+        try {
+            const response = await fetch(`${baseUrl}/auth/logout`, {
+                method: "POST",
+                headers: {
+                    "accept": "application/json;charset=UTF-8",
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            if (response.ok) {
+                alert("Logged Out!")
+                setIsLoggedIn(false);
+            } else {
+                const error = new Error();
+                error.message = 'Something went wrong!'
+            }
+        } catch (e) {
+            alert(`Error ${e.message}`)
+        }
+
+    }
+
 
     return (
-        <MovieReleasesContext.Provider
-            value={{movies, ismoviesLoaded, updateMovies, ogMoviesValues}}
-        >
+        <GlobalContext.Provider value={{
+            isLoggedIn,
+            updateIsLoggedIn,
+            authHeader,
+            callLogin,
+            loginResponse,
+            toggleModal,
+            modalIsOpen,
+            isRegistered,
+            callSignUp,
+            baseUrl,
+            movieId,
+            updateMovieId,
+            callLogOut
+        }}>
             {children}
-        </MovieReleasesContext.Provider>
+        </GlobalContext.Provider>
     );
 }
